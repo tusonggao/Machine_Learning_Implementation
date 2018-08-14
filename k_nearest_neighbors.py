@@ -2,6 +2,7 @@ from __future__ import print_function, division
 import numpy as np
 from mlfromscratch.utils import euclidean_distance
 
+############################
 
 class KNN():
     """ K Nearest Neighbors classifier.
@@ -40,4 +41,6 @@ class KNN():
             label = self._vote(k_nearest_neighbors)
             y_pred[i] = label
         return y_pred
+    
+    ####################3
         
