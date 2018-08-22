@@ -47,21 +47,7 @@ class BPNet(object):
         [m, n] = shape(dataMat)
         for i in range(n-1):
             dataMat[:, i] = (dataMat[:, i] - mean(dataMat[:, i]))/(std(dataMat[:, i]) + 1.0e-10)
-        return dataMat
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+        return dataMat       
 
 
 if __name__=='__main__':
