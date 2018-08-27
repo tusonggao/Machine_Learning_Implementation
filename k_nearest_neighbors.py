@@ -6,36 +6,6 @@ import pandas as pd
 
 from collections import Counter
 
-from sklearn.model_selection import train_test_split
-from sklearn.datasets import fetch_mldata
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import accuracy_score
-
-SEED = 911
-
-#mnist = fetch_mldata('MNIST original')
-#train_X, test_X, train_y, test_y = train_test_split(mnist.data,
-#            mnist.target, test_size=0.2, random_state=SEED)
-#print('after train_test_split, train_X.shape: ', train_X.shape,
-#      'train_y.shape: ', train_y.shape)
-
-
-train_df = pd.read_csv('C:/D_Disk/tsg_prog/Digit_Recognizer/mnist_train.csv')
-train_df = train_df.sample(5000)
-print('train_df.shape is ', train_df.shape)
-
-train_y = train_df['label']
-train_X = train_df.drop(['label'], axis=1)
-
-train_X, test_X, train_y, test_y = train_test_split(train_X,
-            train_y, test_size=0.1, random_state=SEED)
-
-test_y = test_y.values
-train_y = train_y.values
-
-print('after train_test_split, train_X.shape: ', train_X.shape,
-      'train_y.shape: ', train_y.shape)
-
 class KNN():
     def __init__(self, k=5):
         self.K = k
@@ -79,7 +49,13 @@ class KNN():
         
         return np.array(y_list)
     
+# test
 if __name__=='__main__':
+    from sklearn.model_selection import train_test_split
+    from sklearn.datasets import fetch_mldata
+    from sklearn.neighbors import KNeighborsClassifier
+    from sklearn.metrics import accuracy_score
+    
 #    train_X = np.array([[1, 1, 1],
 #                        [2, 2, 2],
 #                        [3, 3, 3],
@@ -88,12 +64,27 @@ if __name__=='__main__':
 #    train_y = np.array([0, 1, 1, 1, 1])
 #    test_X = np.array([0, 0, 0])
     
+#-------------------------------------------------------------
+    
+    SEED = 911
+    train_df = pd.read_csv('C:/D_Disk/tsg_prog/Digit_Recognizer/mnist_train.csv')
+    train_df = train_df.sample(5000)
+    print('train_df.shape is ', train_df.shape)
+    train_y = train_df['label']
+    train_X = train_df.drop(['label'], axis=1)
+    train_X, test_X, train_y, test_y = train_test_split(train_X,
+                train_y, test_size=0.1, random_state=SEED)
+    test_y = test_y.values
+    train_y = train_y.values
+    print('after train_test_split, train_X.shape: ', train_X.shape,
+          'train_y.shape: ', train_y.shape)
+
+#--------------------------------------------------------------
+    
     start_t = time.time()
     knn = KNN(5)
     knn.fit(train_X, train_y)
     y_pred = knn.predict(test_X)
-#    print(test_X)
-#    print('y_pred is ', y_pred)
     print('accuacy is ', accuracy_score(test_y, y_pred),
           'cost time: ', time.time()-start_t)
 
