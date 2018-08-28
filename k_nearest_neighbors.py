@@ -7,8 +7,8 @@ import pandas as pd
 from collections import Counter
 
 class KNN():
-    def __init__(self, k=5):
-        self.K = k
+    def __init__(self, n_neighbors=3):
+        self.K = n_neighbors
         return
 
     def fit(self, train_X, train_y):
@@ -23,10 +23,10 @@ class KNN():
         return
     
     def get_result(self, x_vector):
-        distance_X = self.train_X - x_vector
-        distance_X **= 2
-        distance_arr = distance_X.sum(axis=1)
-        sorted_idx = np.argsort(np.sqrt(distance_arr))
+        X_diff = self.train_X - x_vector
+        X_diff **= 2
+        distance_vector = X_diff.sum(axis=1)
+        sorted_idx = np.argsort(np.sqrt(distance_vector))
         y_labels = train_y[sorted_idx]
         y_labels = Counter(y_labels[:self.K])
         y = max(y_labels.keys(), key=lambda x:y_labels[x])
@@ -55,7 +55,9 @@ if __name__=='__main__':
     from sklearn.datasets import fetch_mldata
     from sklearn.neighbors import KNeighborsClassifier
     from sklearn.metrics import accuracy_score
-    
+
+#-------------------------------------------------------------
+
 #    train_X = np.array([[1, 1, 1],
 #                        [2, 2, 2],
 #                        [3, 3, 3],
@@ -66,30 +68,42 @@ if __name__=='__main__':
     
 #-------------------------------------------------------------
     
-    SEED = 911
-    train_df = pd.read_csv('C:/D_Disk/tsg_prog/Digit_Recognizer/mnist_train.csv')
-    train_df = train_df.sample(5000)
-    print('train_df.shape is ', train_df.shape)
-    train_y = train_df['label']
-    train_X = train_df.drop(['label'], axis=1)
-    train_X, test_X, train_y, test_y = train_test_split(train_X,
-                train_y, test_size=0.1, random_state=SEED)
-    test_y = test_y.values
-    train_y = train_y.values
-    print('after train_test_split, train_X.shape: ', train_X.shape,
-          'train_y.shape: ', train_y.shape)
+    data_path = ('C:/D_Disk/machine_learning_in_action/'
+                 'machinelearninginaction-master/Ch02/digits/')
+    train_X = np.loadtxt(data_path + 'train_X.txt')
+    train_y = np.loadtxt(data_path + 'train_y.txt')
+    test_X = np.loadtxt(data_path + 'test_X.txt')
+    test_y = np.loadtxt(data_path + 'test_y.txt')
+    print('train_X is', train_X.shape)
+    print('train_y is', train_y.shape)
+    print('test_X is', test_X.shape)
+    print('test_y is', test_y.shape)
+    
+#------------------------------------------------------------------
+    
+#    SEED = 911
+#    train_df = pd.read_csv('C:/D_Disk/tsg_prog/Digit_Recognizer/mnist_train.csv')
+#    train_df = train_df.sample(20000)
+#    print('train_df.shape is ', train_df.shape)
+#    train_y = train_df['label'].values
+#    train_X = train_df.drop(['label'], axis=1).values
+#    train_X, test_X, train_y, test_y = train_test_split(train_X,
+#                train_y, test_size=0.025, random_state=SEED)
+#    
+#    print('after train_test_split, train_X.shape: ', train_X.shape,
+#          'train_y.shape: ', train_y.shape)
 
-#--------------------------------------------------------------
+#------------------------------------------------------------------
     
     start_t = time.time()
-    knn = KNN(5)
+    knn = KNN(n_neighbors=3)
     knn.fit(train_X, train_y)
     y_pred = knn.predict(test_X)
     print('accuacy is ', accuracy_score(test_y, y_pred),
           'cost time: ', time.time()-start_t)
 
     start_t = time.time()
-    neigh = KNeighborsClassifier(n_neighbors=5)
+    neigh = KNeighborsClassifier(n_neighbors=3)
     neigh.fit(train_X, train_y) 
     y_pred_sklearn = neigh.predict(test_X)
     print('accuacy is ', accuracy_score(test_y, y_pred_sklearn),
