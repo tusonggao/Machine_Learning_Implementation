@@ -6,7 +6,7 @@ import pandas as pd
 
 from collections import Counter
 
-class KNN():
+class KNN(object):
     def __init__(self, n_neighbors=3):
         self.K = n_neighbors
         return
@@ -36,7 +36,7 @@ class KNN():
         if isinstance(test_X, pd.DataFrame):
             test_X = test_X.values
         
-        if len(test_X.shape)==1:
+        if test_X.ndim==1:
             test_X.resize((1, len(test_X)))
         
         assert test_X.shape[1]==self.train_X.shape[1], 'test_X must has the same width as train_X'

@@ -43,7 +43,7 @@ class DecisionTreeCARTClassifier(object):
         #如果所有数据的类别标签都相同 则停止构造子树
         if len(np.unique(data[:, -1]))==1:
             tree_node = DecisionTreeCARTNode()
-            tree_node.label = data[1, -1]
+            tree_node.label = data[0, -1]
             return tree_node
         
         split_fea_idx = None
@@ -63,12 +63,13 @@ class DecisionTreeCARTClassifier(object):
         
         if gini_val_min!=999: #发生子节点分裂
             equal_data = data[data[:, split_fea_idx]==split_fea_val]
-            non_equal_data = data[data[:, split_fea_idx]==split_fea_val]
+            non_equal_data = data[data[:, split_fea_idx]!=split_fea_val]
             tree_node.child = {0: self._build_tree_node(non_equal_data),
                                1: self._build_tree_node(equal_data)}
         else:  #所有值相等 且不再刻意分裂  则将出现次数最多的标签作为最后标签
             y_counter = Counter(data[:, -1])
             tree_node.label = max(y_counter.keys(), key=lambda x:y_counter[x])
+            print('not split with two label')
         return tree_node
         
     def _build_tree(self, data):
@@ -83,6 +84,7 @@ class DecisionTreeCARTClassifier(object):
                 node = node.child[1]
             else:
                 node = node.child[0]
+        
         return node.label
     
     def fit(self, train_X, train_y):
@@ -92,10 +94,12 @@ class DecisionTreeCARTClassifier(object):
             train_y = train_y.values
 
         assert len(train_X)==len(train_y), 'train_X must has the same length as train_y'
+
+        if train_y.ndim == 1:
+            train_y = np.reshape(train_y, (-1, 1))
         
         self.train_X = train_X
         self.train_y = train_y
-        train_y.resize((len(train_y), 1))
         self._build_tree(np.hstack((train_X, train_y)))
         return
     
@@ -103,7 +107,7 @@ class DecisionTreeCARTClassifier(object):
         if isinstance(test_X, pd.DataFrame):
             test_X = test_X.values
         
-        if len(test_X.shape)==1:
+        if test_X.ndim==1:
             test_X.resize((1, len(test_X)))
         
         assert test_X.shape[1]==self.train_X.shape[1], 'test_X must has the same width as train_X'
@@ -122,7 +126,6 @@ if __name__=='__main__':
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import accuracy_score
     from sklearn.datasets import load_iris
-
 
 #-------------------------------------------------------------
 #模仿《统计学习方法(李航)》P59表格构造如下数据
@@ -147,23 +150,24 @@ if __name__=='__main__':
                         [2, 1, 0, 2],
                         [2, 0, 0, 0]])
     train_y = np.array([0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0])
-    train_y.resize((len(train_y), 1))
-#    test_X = np.array([0, 0, 0, 0])
-    test_X = np.array([1, 1, 1, 2])
+    # train_y.resize((len(train_y), 1))
+    train_y = np.reshape(train_y, (-1, 1))
+    test_X = np.array([0, 1, 0, 0])
+#    test_X = np.array([1, 1, 1, 2])
     
     print(train_X.shape, train_y.shape, test_X.shape)
     print(np.hstack((train_X, train_y)))
     
 #-------------------------------------------------------------
     
-#    iris = load_iris()
-#    train_X, test_X, train_y, test_y = train_test_split(iris.data,
-#            iris.target, test_size=0.2, random_state=0)
-#    
-#    print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
-#    clf = DecisionTreeClassifier(random_state=0)
-#    scores = cross_val_score(clf, iris.data, iris.target, cv=10)
-#    print(scores)
+    iris = load_iris()
+    train_X, test_X, train_y, test_y = train_test_split(iris.data,
+            iris.target, test_size=0.5, random_state=0)
+    
+    print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
+    clf = DecisionTreeClassifier(random_state=0)
+    scores = cross_val_score(clf, iris.data, iris.target, cv=10)
+    print(scores)
     
 #------------------------------------------------------------------
     
@@ -186,22 +190,27 @@ if __name__=='__main__':
     treeCART.fit(train_X, train_y)
     y_pred_cart = treeCART.predict(test_X)
     print('y_pred_cart is ', y_pred_cart,
+          'accuracy_score is ', accuracy_score(test_y, y_pred_cart),
           'cost time: ', time.time()-start_t)
-    
-    print(np.hstack((train_X, train_y)))
     
     start_t = time.time()
-    treeSklearn = DecisionTreeClassifier(random_state=0)
+    treeSklearn = DecisionTreeClassifier()
     treeSklearn.fit(train_X, train_y)
     y_pred_sklearn = treeSklearn.predict(test_X)
-    print('y_pred_sklearn is ', y_pred_cart,
+    print('y_pred_sklearn is ', y_pred_sklearn,
+          'accuracy_score is ', accuracy_score(test_y, y_pred_sklearn),
           'cost time: ', time.time()-start_t)
+
+    a = np.array([[1], [2], [3]])
+    b = np.array([[2], [3], [4]])
+    np.hstack((a, b))
+
+
     
-    print(np.hstack((train_X, train_y)))
     
 #------------------------------------------------------------------
     
-#    start_t = time.time()
+    # start_t = time.time()
 #    knn = KNN(n_neighbors=3)
 #    knn.fit(train_X, train_y)
 #    y_pred = knn.predict(test_X)
@@ -212,5 +221,5 @@ if __name__=='__main__':
 #    neigh = KNeighborsClassifier(n_neighbors=3)
 #    neigh.fit(train_X, train_y) 
 #    y_pred_sklearn = neigh.predict(test_X)
-#    print('accuacy is ', accuracy_score(test_y, y_pred_sklearn),
+#     print('accuacy is ', accuracy_score(test_y, y_pred_sklearn),
 #          'cost time: ', time.time()-start_t)
