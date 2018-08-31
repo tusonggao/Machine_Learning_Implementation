@@ -37,8 +37,9 @@ class RandomForestClassifier_tsg(object):
         return True
 
     def _predict_x_vector(self, x_vector):
+        outcome_y = []
         for i in range(self.n_estimators):
-            y = self._built_trees[i].predict(test_X)
+            y = self._built_trees[i].predict(x_vector)[0]
             outcome_y.append(y)
         y_counter = Counter(outcome_y)
         return max(y_counter.keys(), key=lambda x: y_counter[x])
@@ -106,7 +107,7 @@ if __name__ == '__main__':
     iris = load_iris()
     train_X, test_X, train_y, test_y = train_test_split(iris.data,
                                                         iris.target,
-                                                        test_size=0.5,
+                                                        test_size=0.3,
                                                         random_state=0)
     print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
 
@@ -127,10 +128,10 @@ if __name__ == '__main__':
     # ------------------------------------------------------------------
 
     start_t = time.time()
-    rf_tsg = RandomForestClassifier_tsg(n_estimators=30)
+    rf_tsg = RandomForestClassifier_tsg(n_estimators=1000)
     rf_tsg.fit(train_X, train_y)
     y_pred_rf_tsg = rf_tsg.predict(test_X)
-    print('y_pred_cart is ', y_pred_rf_tsg,
+    print('y_pred_rf_tsg is ', y_pred_rf_tsg,
           'accuracy_score is ', accuracy_score(test_y, y_pred_rf_tsg),
           'cost time: ', time.time() - start_t)
 
@@ -138,6 +139,6 @@ if __name__ == '__main__':
     rf = RandomForestClassifier()
     rf.fit(train_X, train_y)
     y_pred_rf = rf.predict(test_X)
-    print('y_pred_sklearn is ', y_pred_rf,
+    print('y_pred_rf is ', y_pred_rf,
           'accuracy_score is ', accuracy_score(test_y, y_pred_rf),
           'cost time: ', time.time() - start_t)
