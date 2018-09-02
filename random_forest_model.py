@@ -99,8 +99,8 @@ if __name__ == '__main__':
     test_X = np.array([0, 1, 0, 0])
     #    test_X = np.array([1, 1, 1, 2])
 
-    print(train_X.shape, train_y.shape, test_X.shape)
-    print(np.hstack((train_X, train_y)))
+    # print(train_X.shape, train_y.shape, test_X.shape)
+    # print(np.hstack((train_X, train_y)))
 
     # -------------------------------------------------------------
 
