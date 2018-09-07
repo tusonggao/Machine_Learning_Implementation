@@ -16,7 +16,7 @@ class DecisionTreeCARTNode(object):
         return
 
 class DecisionTreeCARTClassifier(object):
-    def __init__(self, leaf_instance_num=1):
+    def __init__(self, leaf_instance_num=2):
         self.root = DecisionTreeCARTNode()
         self.leaf_instance_num = leaf_instance_num
         return
@@ -122,106 +122,106 @@ class DecisionTreeCARTClassifier(object):
         return np.array(y_list)
 
 # test
-# if __name__=='__main__':
-#     from sklearn.tree import DecisionTreeClassifier
-#     from sklearn.model_selection import cross_val_score
-#     from sklearn.model_selection import train_test_split
-#     from sklearn.metrics import accuracy_score
-#     from sklearn.datasets import load_iris
+if __name__=='__main__':
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.model_selection import cross_val_score
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import accuracy_score
+    from sklearn.datasets import load_iris
+
+#-------------------------------------------------------------
+#模仿《统计学习方法(李航)》P59表格构造如下数据
+# 特征0 年龄：0 青年  1中年  2 老年
+# 特征1 是否有工作： 0 否 1 是
+# 特征2 有自己的房子: 0 否 1 是
+# 特征3 信贷情况：0 一般 1 好 2 非常好
+# 标签 是否批准贷款： 0 否  1 是
+    train_X = np.array([[0, 0, 0, 0],
+                        [0, 0, 0, 1],
+                        [0, 1, 0, 1],
+                        [0, 1, 1, 0],
+                        [0, 0, 0, 0],
+                        [1, 0, 0, 0],
+                        [1, 0, 0, 1],
+                        [1, 1, 1, 1],
+                        [1, 0, 1, 2],
+                        [1, 0, 1, 2],
+                        [2, 0, 1, 2],
+                        [2, 0, 1, 1],
+                        [2, 1, 0, 1],
+                        [2, 1, 0, 2],
+                        [2, 0, 0, 0]])
+    train_y = np.array([0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0])
+    # train_y.resize((len(train_y), 1))
+    train_y = np.reshape(train_y, (-1, 1))
+    test_X = np.array([0, 1, 0, 0])
+#    test_X = np.array([1, 1, 1, 2])
+
+    print(train_X.shape, train_y.shape, test_X.shape)
+    print(np.hstack((train_X, train_y)))
+
+#-------------------------------------------------------------
+
+    iris = load_iris()
+    train_X, test_X, train_y, test_y = train_test_split(iris.data,
+            iris.target, test_size=0.5, random_state=0)
+
+    print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
+    clf = DecisionTreeClassifier(random_state=0)
+    scores = cross_val_score(clf, iris.data, iris.target, cv=10)
+    print(scores)
+
+#------------------------------------------------------------------
+
+#    SEED = 911
+#    train_df = pd.read_csv('C:/D_Disk/tsg_prog/Digit_Recognizer/mnist_train.csv')
+#    train_df = train_df.sample(20000)
+#    print('train_df.shape is ', train_df.shape)
+#    train_y = train_df['label'].values
+#    train_X = train_df.drop(['label'], axis=1).values
+#    train_X, test_X, train_y, test_y = train_test_split(train_X,
+#                train_y, test_size=0.025, random_state=SEED)
 #
-# #-------------------------------------------------------------
-# #模仿《统计学习方法(李航)》P59表格构造如下数据
-# # 特征0 年龄：0 青年  1中年  2 老年
-# # 特征1 是否有工作： 0 否 1 是
-# # 特征2 有自己的房子: 0 否 1 是
-# # 特征3 信贷情况：0 一般 1 好 2 非常好
-# # 标签 是否批准贷款： 0 否  1 是
-#     train_X = np.array([[0, 0, 0, 0],
-#                         [0, 0, 0, 1],
-#                         [0, 1, 0, 1],
-#                         [0, 1, 1, 0],
-#                         [0, 0, 0, 0],
-#                         [1, 0, 0, 0],
-#                         [1, 0, 0, 1],
-#                         [1, 1, 1, 1],
-#                         [1, 0, 1, 2],
-#                         [1, 0, 1, 2],
-#                         [2, 0, 1, 2],
-#                         [2, 0, 1, 1],
-#                         [2, 1, 0, 1],
-#                         [2, 1, 0, 2],
-#                         [2, 0, 0, 0]])
-#     train_y = np.array([0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0])
-#     # train_y.resize((len(train_y), 1))
-#     train_y = np.reshape(train_y, (-1, 1))
-#     test_X = np.array([0, 1, 0, 0])
-# #    test_X = np.array([1, 1, 1, 2])
+#    print('after train_test_split, train_X.shape: ', train_X.shape,
+#          'train_y.shape: ', train_y.shape)
+
+#------------------------------------------------------------------
+
+    start_t = time.time()
+    treeCART = DecisionTreeCARTClassifier()
+    treeCART.fit(train_X, train_y)
+    y_pred_cart = treeCART.predict(test_X)
+    print('y_pred_cart is ', y_pred_cart,
+          'accuracy_score is ', accuracy_score(test_y, y_pred_cart),
+          'cost time: ', time.time()-start_t)
+
+    start_t = time.time()
+    treeSklearn = DecisionTreeClassifier()
+    treeSklearn.fit(train_X, train_y)
+    y_pred_sklearn = treeSklearn.predict(test_X)
+    print('y_pred_sklearn is ', y_pred_sklearn,
+          'accuracy_score is ', accuracy_score(test_y, y_pred_sklearn),
+          'cost time: ', time.time()-start_t)
+
+    # a = np.array([[1], [2], [3]])
+    # b = np.array([[2], [3], [4]])
+    # np.hstack((a, b))
+
+
+
+
+#------------------------------------------------------------------
+
+    # start_t = time.time()
+#    knn = KNN(n_neighbors=3)
+#    knn.fit(train_X, train_y)
+#    y_pred = knn.predict(test_X)
+#    print('accuacy is ', accuracy_score(test_y, y_pred),
+#          'cost time: ', time.time()-start_t)
 #
-#     print(train_X.shape, train_y.shape, test_X.shape)
-#     print(np.hstack((train_X, train_y)))
-#
-# #-------------------------------------------------------------
-#
-#     iris = load_iris()
-#     train_X, test_X, train_y, test_y = train_test_split(iris.data,
-#             iris.target, test_size=0.5, random_state=0)
-#
-#     print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
-#     clf = DecisionTreeClassifier(random_state=0)
-#     scores = cross_val_score(clf, iris.data, iris.target, cv=10)
-#     print(scores)
-#
-# #------------------------------------------------------------------
-#
-# #    SEED = 911
-# #    train_df = pd.read_csv('C:/D_Disk/tsg_prog/Digit_Recognizer/mnist_train.csv')
-# #    train_df = train_df.sample(20000)
-# #    print('train_df.shape is ', train_df.shape)
-# #    train_y = train_df['label'].values
-# #    train_X = train_df.drop(['label'], axis=1).values
-# #    train_X, test_X, train_y, test_y = train_test_split(train_X,
-# #                train_y, test_size=0.025, random_state=SEED)
-# #
-# #    print('after train_test_split, train_X.shape: ', train_X.shape,
-# #          'train_y.shape: ', train_y.shape)
-#
-# #------------------------------------------------------------------
-#
-#     start_t = time.time()
-#     treeCART = DecisionTreeCARTClassifier()
-#     treeCART.fit(train_X, train_y)
-#     y_pred_cart = treeCART.predict(test_X)
-#     print('y_pred_cart is ', y_pred_cart,
-#           'accuracy_score is ', accuracy_score(test_y, y_pred_cart),
-#           'cost time: ', time.time()-start_t)
-#
-#     start_t = time.time()
-#     treeSklearn = DecisionTreeClassifier()
-#     treeSklearn.fit(train_X, train_y)
-#     y_pred_sklearn = treeSklearn.predict(test_X)
-#     print('y_pred_sklearn is ', y_pred_sklearn,
-#           'accuracy_score is ', accuracy_score(test_y, y_pred_sklearn),
-#           'cost time: ', time.time()-start_t)
-#
-#     a = np.array([[1], [2], [3]])
-#     b = np.array([[2], [3], [4]])
-#     np.hstack((a, b))
-#
-#
-#
-#
-# #------------------------------------------------------------------
-#
-#     # start_t = time.time()
-# #    knn = KNN(n_neighbors=3)
-# #    knn.fit(train_X, train_y)
-# #    y_pred = knn.predict(test_X)
-# #    print('accuacy is ', accuracy_score(test_y, y_pred),
-# #          'cost time: ', time.time()-start_t)
-# #
-# #    start_t = time.time()
-# #    neigh = KNeighborsClassifier(n_neighbors=3)
-# #    neigh.fit(train_X, train_y)
-# #    y_pred_sklearn = neigh.predict(test_X)
-# #     print('accuacy is ', accuracy_score(test_y, y_pred_sklearn),
-# #          'cost time: ', time.time()-start_t)
+#    start_t = time.time()
+#    neigh = KNeighborsClassifier(n_neighbors=3)
+#    neigh.fit(train_X, train_y)
+#    y_pred_sklearn = neigh.predict(test_X)
+#     print('accuacy is ', accuracy_score(test_y, y_pred_sklearn),
+#          'cost time: ', time.time()-start_t)
