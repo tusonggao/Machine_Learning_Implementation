@@ -173,17 +173,17 @@ if __name__=='__main__':
 
 #------------------------------------------------------------------
 
-#    SEED = 911
-#    train_df = pd.read_csv('C:/D_Disk/tsg_prog/Digit_Recognizer/mnist_train.csv')
-#    train_df = train_df.sample(20000)
-#    print('train_df.shape is ', train_df.shape)
-#    train_y = train_df['label'].values
-#    train_X = train_df.drop(['label'], axis=1).values
-#    train_X, test_X, train_y, test_y = train_test_split(train_X,
-#                train_y, test_size=0.025, random_state=SEED)
-#
-#    print('after train_test_split, train_X.shape: ', train_X.shape,
-#          'train_y.shape: ', train_y.shape)
+   SEED = 911
+   train_df = pd.read_csv('C:/D_Disk/tsg_prog/Digit_Recognizer/mnist_train.csv')
+   train_df = train_df.sample(20000)
+   print('train_df.shape is ', train_df.shape)
+   train_y = train_df['label'].values
+   train_X = train_df.drop(['label'], axis=1).values
+   train_X, test_X, train_y, test_y = train_test_split(train_X,
+               train_y, test_size=0.025, random_state=SEED)
+
+   print('after train_test_split, train_X.shape: ', train_X.shape,
+         'train_y.shape: ', train_y.shape)
 
 #------------------------------------------------------------------
 
