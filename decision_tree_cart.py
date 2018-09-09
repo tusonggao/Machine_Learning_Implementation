@@ -203,9 +203,9 @@ if __name__=='__main__':
           'accuracy_score is ', accuracy_score(test_y, y_pred_sklearn),
           'cost time: ', time.time()-start_t)
 
-    # a = np.array([[1], [2], [3]])
-    # b = np.array([[2], [3], [4]])
-    # np.hstack((a, b))
+    a = np.array([[1], [2], [3]])
+    b = np.array([[2], [3], [4]])
+    np.hstack((a, b))
 
 
 
