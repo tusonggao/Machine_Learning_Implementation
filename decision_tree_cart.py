@@ -162,14 +162,14 @@ if __name__=='__main__':
 
 #-------------------------------------------------------------
 
-    iris = load_iris()
-    train_X, test_X, train_y, test_y = train_test_split(iris.data,
-            iris.target, test_size=0.5, random_state=0)
-
-    print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
-    clf = DecisionTreeClassifier(random_state=0)
-    scores = cross_val_score(clf, iris.data, iris.target, cv=10)
-    print(scores)
+    # iris = load_iris()
+    # train_X, test_X, train_y, test_y = train_test_split(iris.data,
+    #         iris.target, test_size=0.5, random_state=0)
+    #
+    # print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
+    # clf = DecisionTreeClassifier(random_state=0)
+    # scores = cross_val_score(clf, iris.data, iris.target, cv=10)
+    # print(scores)
 
 #------------------------------------------------------------------
 
