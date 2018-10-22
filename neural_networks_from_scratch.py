@@ -50,6 +50,38 @@ def single_layer_forward_propagation(A_prev, W_curr, b_curr, activation='relu'):
     
     return activation_func(Z_curr), Z_curr
 
+def full_forward_propagation(X, params_values, nn_architecture):
+    memory = {}
+    A_curr = X
+    
+    for idx, layer in enumerate(nn_architecture):
+        layer_idx = idx + 1
+        A_prev = A_curr
+        activ_function_curr = layer['activation']
+        W_curr = params_values['W' + str(layer_idx)]
+        b_curr = params_values['b' + str(layer_idx)]
+        A_curr, Z_curr = single_layer_forward_propagation(A_prev, 
+                                W_curr, b_curr, activ_function_curr)
+        memory['A' + str(idx)] = A_prev
+        memory['Z' + str(layer_idx)] = Z_curr
+    
+    return A_curr, memory
+
+def get_cost_value(Y_hat, Y):
+    m = Y_hat.shape[1]
+    cost = -1/m*(np.dot(Y, np.log(Y_hat).T) + np.dot(1-Y, np.log(1-Y_hat).T))
+    return np.squeeze(cost)
+
+def convert_prob_into_class(probs):
+    probs_ = np.copy(probs)
+    probs_[probs_ > 0.5] = 1
+    probs_[probs_ <= 0.5] = 0
+    return probs_
+
+def get_accuracy_value(Y_hat, Y):
+    Y_hat_ = convert_prob_into_class(Y_hat)
+    return (Y_hat_==Y).all(axis=0).mean()
+
 
 
 
