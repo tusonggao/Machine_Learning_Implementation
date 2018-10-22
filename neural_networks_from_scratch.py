@@ -1,4 +1,9 @@
 import numpy as np
+from sklearn.datasets import make_moons
+from sklearn.model_selection import train_test_split
+from matplotlib import pyplot as plt
+import seaborn as sns
+
 
 NN_ARCHITECTURE = [
     {'input_dim': 2, 'output_dim': 25, 'activation': 'relu'},
@@ -126,6 +131,80 @@ def full_backward_propagation(Y_hat, Y, memory, params_values, nn_architecture):
         grads_values['db' + str(layer_idx_curr)] = db_curr
 
     return grads_values
+
+def update(params_values, grads_values, nn_architecture, learning_rate):
+    for idx, layer in enumerate(nn_architecture):
+        layer_idx = idx + 1
+        params_values['W' + str(layer_idx)] -= learning_rate*grads_values[
+                                                   'dW' + str(layer_idx)]
+        params_values['b' + str(layer_idx)] -= learning_rate * grads_values[
+            'db' + str(layer_idx)]
+
+    return params_values
+
+def train(X, Y, nn_architecture, epochs, learning_rate):
+    params_values = init_layers(nn_architecture, 2)
+    cost_history = []
+    accuracy_history = []
+
+    for i in range(epochs):
+        Y_hat, cashe = full_backward_propagation(X, params_values, nn_architecture)
+        cost = get_cost_value(Y_hat, Y)
+        cost_history.append(cost)
+        accuracy = get_accuracy_value(Y_hat, Y)
+        accuracy_history.append(accuracy)
+
+        grads_values = full_backward_propagation(Y_hat, Y, cashe, params_values, nn_architecture)
+        params_values = update(params_values, grads_values, nn_architecture, learning_rate)
+
+    return params_values, cost_history, accuracy_history
+
+N_SAMPLES = 1000
+TEST_SIZE = 0.1
+
+X, y = make_moons(n_samples=N_SAMPLES, noise=0.2, random_state=100)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, random_state=42)
+
+def make_plot(X, y, plot_name, file_name=None, XX=None, preds=None, dark=False):
+    if dark:
+        plt.style.use('dark_background')
+    else:
+        sns.set_style('whitegrid')
+    plt.figure(figsize=(16, 12))
+    axes = plt.gca()
+    axes.set(xlabel='$X_1$', ylabel='$X_2$')
+    plt.title(plot_name, fontsize=30)
+    plt.subplots_adjust(left=0.20)
+    plt.subplots_adjust(right=0.80)
+
+    if(XX is not None and YY is not None and preds is not None):
+        plt.contourf(XX, YY, preds.reshape(XX.shape), 25, alpha=1,
+                     cmap=plt.cm.Spectral)
+        plt.contourf(XX, YY, preds.reshape(XX.shape), levels=[.5],
+                     cmap='Greys', vmin=0, vmax=.6)
+    plt.scatter(X[:, 0], X[:, 1], c=y.ravel(), s=40, cmap=plt.cm.Spectral,
+                edgecolors='black')
+    if(file_name):
+        plt.savefig(file_name)
+        plt.close()
+
+make_plot(X, y, 'Dataset')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
