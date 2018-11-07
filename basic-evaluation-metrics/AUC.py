@@ -1,5 +1,7 @@
 import numpy as np
 
+# https://blog.csdn.net/dinosoft/article/details/43114935
+
 def auc(labels, pred_p):
 
 
