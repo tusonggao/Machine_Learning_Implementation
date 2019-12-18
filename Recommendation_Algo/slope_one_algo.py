@@ -37,7 +37,7 @@ class SlopeOne(object):
                     diffs_sum = (freqs_new[item1][item2] * diffs_new[item1][item2] +
                                  self.freqs[item1][item2] * self.diffs[item1][item2])
                     self.freqs[item1][item2] += freqs_new[item1][item2]
-                    self.diffs[item1][item2] = diffs_sum / self.diffs[item1][item2]
+                    self.diffs[item1][item2] = diffs_sum / self.freqs[item1][item2]
                 else:
                     self.freqs[item1][item2] = freqs_new[item1][item2]
                     self.diffs[item1][item2] = diffs_new[item1][item2]
