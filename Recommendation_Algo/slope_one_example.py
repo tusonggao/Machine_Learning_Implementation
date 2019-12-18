@@ -5,7 +5,7 @@ class SlopeOne(object):
         self.diffs = {}
         self.freqs = {}
 
-    def _compute_freqs_diffs(self, userdata):
+    def _compute_freqs_diffs(self, userdata):  # 计算统计信息
         freqs, diffs = {}, {}
         for ratings in userdata.values():
             for item1, rating1 in ratings.items():
@@ -42,7 +42,7 @@ class SlopeOne(object):
                     self.freqs[item1][item2] = freqs_new[item1][item2]
                     self.diffs[item1][item2] = diffs_new[item1][item2]
 
-    def predict(self, userprefs):
+    def predict(self, userprefs):  # 预测
         preds, freqs = {}, {}
         for item, rating in userprefs.items():
             for diffitem, diffratings in self.diffs.items():
