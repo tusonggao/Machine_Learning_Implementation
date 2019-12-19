@@ -2,61 +2,61 @@
 
 class SlopeOne(object):
     def __init__(self):
+        self.nums = {}
         self.diffs = {}
-        self.freqs = {}
 
-    def _compute_freqs_diffs(self, userdata):  # 计算统计信息
-        freqs, diffs = {}, {}
+    def _compute_nums_diffs(self, userdata):  # 计算统计信息
+        nums, diffs = {}, {}
         for ratings in userdata.values():
             for item1, rating1 in ratings.items():
-                freqs.setdefault(item1, {})
+                nums.setdefault(item1, {})
                 diffs.setdefault(item1, {})
                 for item2, rating2 in ratings.items():
-                    freqs[item1].setdefault(item2, 0)
+                    nums[item1].setdefault(item2, 0)
                     diffs[item1].setdefault(item2, 0.0)
-                    freqs[item1][item2] += 1
+                    nums[item1][item2] += 1
                     diffs[item1][item2] += rating1 - rating2
         for item1, ratings in diffs.items():
             for item2 in ratings:
-                ratings[item2] /= freqs[item1][item2]
-        return freqs, diffs
+                ratings[item2] /= nums[item1][item2]
+        return nums, diffs
 
     def fit(self, userdata):  # 使用用户打分数据进行训练
-        self.freqs, self.diffs = self._compute_freqs_diffs(userdata)
+        self.nums, self.diffs = self._compute_nums_diffs(userdata)
 
     def update(self, userdata):  # 使用新的用户打分数据，更新统计信息，适用于在线学习
-        freqs_new, diffs_new = self._compute_freqs_diffs(userdata)
+        nums_new, diffs_new = self._compute_nums_diffs(userdata)
 
-        for item1 in freqs_new:
-            for item2 in freqs_new:
+        for item1 in nums_new:
+            for item2 in nums_new:
                 if item1 == item2:
                     continue
                 if item1 not in self.diffs:
                     self.freqs[item1], self.diffs[item1] = {}, {}
-                if item2 in self.freqs[item1]:
-                    diffs_sum = (freqs_new[item1][item2] * diffs_new[item1][item2] +
-                                 self.freqs[item1][item2] * self.diffs[item1][item2])
-                    self.freqs[item1][item2] += freqs_new[item1][item2]
-                    self.diffs[item1][item2] = diffs_sum / self.freqs[item1][item2]
+                if item2 in self.nums[item1]:
+                    diffs_sum = (nums_new[item1][item2] * diffs_new[item1][item2] +
+                                 self.nums[item1][item2] * self.diffs[item1][item2])
+                    self.nums[item1][item2] += nums_new[item1][item2]
+                    self.diffs[item1][item2] = diffs_sum / self.nums[item1][item2]
                 else:
-                    self.freqs[item1][item2] = freqs_new[item1][item2]
+                    self.nums[item1][item2] = nums_new[item1][item2]
                     self.diffs[item1][item2] = diffs_new[item1][item2]
 
     def predict(self, userprefs):  # 预测
-        preds, freqs = {}, {}
+        preds, nums = {}, {}
         for item, rating in userprefs.items():
             for diffitem, diffratings in self.diffs.items():
                 try:
-                    freq = self.freqs[diffitem][item]
+                    num = self.nums[diffitem][item]
                 except KeyError:
                     continue
                 preds.setdefault(diffitem, 0.0)
-                freqs.setdefault(diffitem, 0)
-                preds[diffitem] += freq * (diffratings[item] + rating)
-                freqs[diffitem] += freq
-        return dict([(item, value / freqs[item])
+                nums.setdefault(diffitem, 0)
+                preds[diffitem] += num * (diffratings[item] + rating)
+                nums[diffitem] += num
+        return dict([(item, value / nums[item])
                      for item, value in preds.items()
-                     if item not in userprefs and freqs[item] > 0])
+                     if item not in userprefs and nums[item] > 0])
 
 
 # Python code to demonstrate working of unittest
